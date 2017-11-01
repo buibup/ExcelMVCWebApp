@@ -1,0 +1,116 @@
+@{
+    ViewBag.Title = "Read Excel File and Display in mvc5";
+}
+@model System.Data.DataTable
+@using System.Data
+
+<style type="text/css">
+  /* Generic Styling, for Desktops/Laptops */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  /* Zebra striping */
+  tr:nth-of-type(odd) {
+    background: #eee;
+  }
+
+  th {
+    background: #333;
+    color: white;
+    font-weight: bold;
+  }
+
+  td, th {
+    padding: 6px;
+    border: 1px solid #ccc;
+    text-align: left;
+  }
+  /*
+  Max width before this PARTICULAR table gets nasty
+  This query will take effect for any screen smaller than 760px
+  and also iPads specifically.
+  */
+  @@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+
+    /* Force table to not be like tables anymore */
+    table, thead, tbody, th, td, tr {
+      display: block;
+    }
+
+      /* Hide table headers (but not display: none;, for accessibility) */
+      thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+      }
+
+    tr {
+      border: 1px solid #ccc;
+    }
+
+    td {
+      /* Behave  like a "row" */
+      border: none;
+      border-bottom: 1px solid #eee;
+      position: relative;
+      padding-left: 50%;
+    }
+
+      td:before {
+        /* Now like a table header */
+        position: absolute;
+        /* Top/left values mimic padding */
+        top: 6px;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+      }
+
+      /*
+   Label the data
+   */
+      td:before {
+        content: attr(data-title);
+      }
+  }
+</style>
+
+
+
+<h2>Read Excel File and Display in mvc5</h2>
+@using (Html.BeginForm("Index", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+  @Html.AntiForgeryToken();
+  @Html.ValidationSummary();
+
+  <label class="text-info">Upload Excel File</label>
+    <input type="file" class="form-control" name="uploadfile" id="uploadfile" />
+    <input type="submit" value="submit" class="btn btn-default" />
+
+  if (Model != null)
+  {
+    <table class="table table-responsive table-bordered">
+      <thead>
+        <tr>
+          @foreach (DataColumn column in Model.Columns)
+          {
+            <th>@column.ColumnName</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (DataRow row in Model.Rows)
+        {
+          <tr>
+            @foreach (DataColumn col in Model.Columns)
+            {
+              <td>@row[col.ColumnName]</td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+}
